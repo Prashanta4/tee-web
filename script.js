@@ -158,7 +158,7 @@ async function predictImage() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
         
-        const response = await fetch('https://prasanta4-my-model-deployment.hf.space/predict', {
+        const response = await fetch('https://prasanta4-tea-disease-classification-model.hf.space/predict', {
             method: 'POST',
             body: formData,
             signal: controller.signal
@@ -375,7 +375,7 @@ function downloadReport() {
         
         const link = document.createElement('a');
         link.href = url;
-        link.download = `gallbladder-analysis-${new Date().toISOString().split('T')[0]}.txt`;
+        link.download = `tea-disease-analysis-${new Date().toISOString().split('T')[0]}.txt`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -416,11 +416,11 @@ function generateReportContent(data) {
     const timestamp = new Date().toLocaleString();
     
     return `
-GALLBLADDER AI DIAGNOSTIC REPORT
+TEA LEAF DISEASE ANALYSIS REPORT
 ================================
 
 Generated: ${timestamp}
-System: Gallbladder AI Diagnostics v1.0
+System: Tea AI Diagnostics v1.0
 
 ANALYSIS RESULTS
 ================
@@ -440,7 +440,7 @@ Please consult with a qualified healthcare professional for proper medical evalu
 SYSTEM INFORMATION
 ==================
 
-AI Model: Gallbladder Classification Neural Network
+AI Model: Tea Classification Neural Network
 Analysis Date: ${new Date().toLocaleDateString()}
 Report Generated: ${timestamp}
 
