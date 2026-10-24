@@ -11,11 +11,16 @@
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-success">
-        <div class="container">
+        <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand" href="#">
                 <i class="fas fa-leaf me-2"></i>
                 Tea Disease Classification
             </a>
+
+            <div id="statusIndicator" class="d-flex align-items-center status-offline">
+                <div class="status-dot me-2"></div>
+                <span class="status-text small fw-bold text-white">Connecting...</span>
+            </div>
         </div>
     </nav>
 
@@ -25,7 +30,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <h1 class="hero-title">AI-Powered Tea Leaf Diagnosis</h1>
-                    <p class="hero-subtitle">Identify and classify tea leaf diseases instantly using AI and deep learning technology.</p>
+                    <p class="hero-subtitle">Identify and classify tea leaf diseases and pests instantly using deep learning, and see exactly which parts of the leaf the model relied on with explainable AI.</p>
                 </div>
                 <div class="col-lg-6 text-center">
                     <div class="hero-icon">
@@ -43,7 +48,7 @@
                 <div class="upload-card">
                     <div class="card-header">
                         <h3 class="mb-0"><i class="fas fa-upload me-2"></i>Upload Leaf Image</h3>
-                        <p class="text-muted mb-0">Select a tea leaf image for AI-based disease detection</p>
+                        <p class="mb-0">Select a tea leaf image for AI-based disease detection</p>
                     </div>
 
                     <div class="card-body">
@@ -51,9 +56,9 @@
                             <div class="upload-content">
                                 <i class="fas fa-cloud-upload-alt upload-icon"></i>
                                 <h4>Drag & Drop or Click to Upload</h4>
-                                <p>Supported formats: JPG, PNG (Max 10MB)</p>
+                                <p>Supported formats: JPG, PNG, GIF (Max 10MB)</p>
                                 <input type="file" id="imageInput" accept="image/*" class="d-none">
-                                <button type="button" class="btn btn-primary" onclick="document.getElementById('imageInput').click()">
+                                <button type="button" class="btn btn-primary" id="chooseFileBtn">
                                     <i class="fas fa-folder-open me-2"></i>Choose File
                                 </button>
                             </div>
@@ -61,17 +66,32 @@
 
                         <div id="preview" class="preview-section"></div>
 
-                        <div class="text-center mt-4">
-                            <button id="predictBtn" onclick="predictImage()" class="btn btn-success btn-lg" disabled>
+                        <div class="text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
+                            <button id="predictBtn" class="btn btn-success btn-lg" disabled>
                                 <i class="fas fa-brain me-2"></i>
                                 <span class="btn-text">Analyze Leaf</span>
-                                <div class="spinner-border spinner-border-sm ms-2 d-none" role="status"></div>
                             </button>
+
+                            <button id="xaiBtn" class="btn btn-warning btn-lg" disabled>
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <span class="btn-text">Analyze with XAI</span>
+                            </button>
+                        </div>
+
+                        <div id="loadingProgress" class="mt-4 d-none">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-bold text-muted small" id="progressText">Analyzing...</span>
+                                <span class="fw-bold text-muted small" id="progressPercent">0%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <small class="text-muted d-block mt-2 text-center fst-italic" id="progressHint">This might take up to 40 seconds for XAI analysis...</small>
                         </div>
 
                         <div id="result" class="result-section"></div>
 
-                        <div id="error" class="alert alert-danger d-none" role="alert">
+                        <div id="error" class="alert alert-danger d-none mt-3" role="alert">
                             <i class="fas fa-exclamation-triangle me-2"></i>
                             <span id="errorMessage"></span>
                         </div>
@@ -79,25 +99,25 @@
                 </div>
 
                 <div class="row mt-5">
-                    <div class="col-md-4">
+                    <div class="col-md-4 mb-3">
                         <div class="info-card">
                             <div class="info-icon"><i class="fas fa-lock"></i></div>
                             <h5>Private & Secure</h5>
                             <p>Your images are processed securely and deleted immediately after analysis.</p>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 mb-3">
                         <div class="info-card">
                             <div class="info-icon"><i class="fas fa-bolt"></i></div>
                             <h5>Fast & Accurate</h5>
-                            <p>Detect diseases like Brown Blight, Red Spider, and more with precision.</p>
+                            <p>Detect diseases and pests like Brown Blight, Gray Blight, Red Spider and more.</p>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 mb-3">
                         <div class="info-card">
-                            <div class="info-icon"><i class="fas fa-chart-line"></i></div>
-                            <h5>AI Driven</h5>
-                            <p>Powered by an EfficientNet-based hybrid neural network with attention modules.</p>
+                            <div class="info-icon"><i class="fas fa-eye"></i></div>
+                            <h5>Explainable AI</h5>
+                            <p>An EfficientNet-based hybrid network with attention modules, explained with Grad-CAM, SHAP and LIME.</p>
                         </div>
                     </div>
                 </div>
@@ -107,8 +127,15 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container text-center">
-            <p>&copy; 2025 Tea Leaf Disease Classifier. For research and educational use only.</p>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-2 mb-md-0">&copy; 2025 Tea Leaf Disease Classifier. For research and educational use only.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0"><strong>Disclaimer:</strong> This tool is for educational purposes and should not replace advice from a qualified agricultural expert.</p>
+                </div>
+            </div>
         </div>
     </footer>
 
